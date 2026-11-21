@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Train Ticket Chatbot</title>
+    <style>
+        #chatbox {
+            width: 400px;
+            height: 400px;
+            border: 1px solid #ccc;
+            overflow-y: scroll;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .user, .bot {
+            padding: 5px;
+            margin: 5px;
+            border-radius: 10px;
+        }
+        .user { background-color: #d1e7fd; text-align: right; }
+        .bot { background-color: #f0f0f0; text-align: left; }
+    </style>
+</head>
+<body>
+    <h2>Train Ticket Chatbot</h2>
+    <div id="chatbox"></div>
+    <input type="text" id="userInput" placeholder="Ask me anything..." />
+    <button onclick="sendMessage()">Send</button>
+
+    <br><br>
+    <button onclick="quickReply('Available trains')">Available Trains</button>
+    <button onclick="quickReply('Booking status')">Booking Status</button>
+    <button onclick="quickReply('Verify ticket')">Verify Ticket</button>
+    <button onclick="quickReply('Refund policy')">Refund Policy</button>
+
+    <script>
+        function sendMessage() {
+            let userInput = document.getElementById("userInput").value;
+            let chatbox = document.getElementById("chatbox");
+
+            chatbox.innerHTML += `<div class="user">${userInput}</div>`;
+            document.getElementById("userInput").value = "";
+
+            fetch("/chatbot-response/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: userInput })
+            })
+            .then(response => response.json())
+            .then(data => {
+                chatbox.innerHTML += `<div class="bot">${data.reply}</div>`;
+                chatbox.scrollTop = chatbox.scrollHeight;
+            });
+        }
+
+        function quickReply(message) {
+            document.getElementById("userInput").value = message;
+            sendMessage();
+        }
+    </script>
+</body>
+</html>
